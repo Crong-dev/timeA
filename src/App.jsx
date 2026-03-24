@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { TodoForm } from "../components/TodoForm";
+import { TodoItem } from "../components/TodoItem";
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -15,7 +17,7 @@ function App() {
     fetchTodos();
   }, []);
 
-  const handleToggle = async (todo) => {
+  const onToggle = async (todo) => {
     const res = await fetch(`http://localhost:4000/todo/${todo.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -29,7 +31,7 @@ function App() {
     setTodos((prev) => prev.map((t) => (t.id === todo.id ? toggleTodo : t)));
   };
 
-  const handleDelete = async (todoId) => {
+  const onDelete = async (todoId) => {
     await fetch(`http://localhost:4000/todo/${todoId}`, {
       method: "DELETE",
     });
@@ -37,7 +39,7 @@ function App() {
     setTodos((prev) => prev.filter((t) => t.id !== todoId));
   };
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     const res = await fetch("http://localhost:4000/todo", {
@@ -60,16 +62,7 @@ function App() {
     <>
       <h1>Todo List</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-          }}
-        />
-        <button>추가</button>
-      </form>
+      <TodoForm title={title} setTitle={setTitle} onSubmit={onSubmit} />
 
       <ul>
         <h2> --- 할일 목록 ---</h2>
@@ -77,16 +70,7 @@ function App() {
           .filter((todo) => todo.completed === false)
           .map((todo) => {
             return (
-              <li key={todo.id}>
-                <p>{todo.title}</p>
-                <p>{todo.createdAt}</p>
-                <div>
-                  <button onClick={() => handleToggle(todo)}>
-                    {todo.completed ? "취소" : "완료"}
-                  </button>
-                  <button onClick={() => handleDelete(todo.id)}>삭제</button>
-                </div>
-              </li>
+              <TodoItem todo={todo} onToggle={onToggle} onDelete={onDelete} />
             );
           })}
 
@@ -95,16 +79,7 @@ function App() {
           .filter((todo) => todo.completed === true)
           .map((todo) => {
             return (
-              <li key={todo.id}>
-                <p>{todo.title}</p>
-                <p>{todo.createdAt}</p>
-                <div>
-                  <button onClick={() => handleToggle(todo)}>
-                    {todo.completed ? "취소" : "완료"}
-                  </button>
-                  <button onClick={() => handleDelete(todo.id)}>삭제</button>
-                </div>
-              </li>
+              <TodoItem todo={todo} onToggle={onToggle} onDelete={onDelete} />
             );
           })}
       </ul>
